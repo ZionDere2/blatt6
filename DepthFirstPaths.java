@@ -61,6 +61,7 @@ public class DepthFirstPaths {
     }
 
     public void dfs(Graph G) {
+        marked = new boolean[G.V()];
         dfs(G, s);
     }
 
