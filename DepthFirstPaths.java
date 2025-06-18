@@ -66,41 +66,52 @@ public class DepthFirstPaths {
 
     // depth first search from v
     private void dfs(Graph G, int v) {
-        // TODO: Zeilen hinzufuegen
+        // mark node and store preorder
         marked[v] = true;
+        preorder.add(v);
+
+        // explore neighbors
         for (int w : G.adj(v)) {
             if (!marked[w]) {
+                edgeTo[w] = v;
+                distTo[w] = distTo[v] + 1;
                 dfs(G, w);
             }
         }
+
+        // node finished
+        postorder.add(v);
     }
 
     public void nonrecursiveDFS(Graph G) {
-        // TODO: Zeilen hinzufuegen
+        // initialise arrays
         marked = new boolean[G.V()];
-        // to be able to iterate over each adjacency list, keeping track of which
-        // vertex in each adjacency list needs to be explored next
-        Iterator<Integer>[] adj = (Iterator<Integer>[]) new Iterator[G.V()];
-        for (int v = 0; v < G.V(); v++)
-            adj[v] = G.adj(v).iterator();
 
-        // depth-first search using an explicit stack
+        // for preorder/postorder the queues are already set up in constructor
+        Iterator<Integer>[] adj = (Iterator<Integer>[]) new Iterator[G.V()];
+        for (int v = 0; v < G.V(); v++) {
+            adj[v] = G.adj(v).iterator();
+        }
+
         Stack<Integer> stack = new Stack<Integer>();
         marked[s] = true;
+        preorder.add(s);
         stack.push(s);
         while (!stack.isEmpty()) {
             int v = stack.peek();
             if (adj[v].hasNext()) {
                 int w = adj[v].next();
                 if (!marked[w]) {
-                    // discovered vertex w for the first time
                     marked[w] = true;
+                    edgeTo[w] = v;
+                    distTo[w] = distTo[v] + 1;
+                    preorder.add(w);
                     stack.push(w);
                 }
             } else {
+                postorder.add(v);
                 stack.pop();
             }
-
         }
     }
 
@@ -129,7 +140,15 @@ public class DepthFirstPaths {
      * 
      */
     public List<Integer> pathTo(int v) {
-        // TODO
+        validateVertex(v);
+        if (!hasPathTo(v)) return null;
+
+        LinkedList<Integer> path = new LinkedList<Integer>();
+        for (int x = v; x != s; x = edgeTo[x]) {
+            path.addFirst(x);
+        }
+        path.addFirst(s);
+        return path;
     }
 
     /**

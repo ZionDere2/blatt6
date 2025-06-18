@@ -2,6 +2,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
+import java.util.LinkedList;
 
 public class RandomDepthFirstPaths {
     private boolean[] marked; // marked[v] = is there an s-v path?
@@ -28,11 +29,41 @@ public class RandomDepthFirstPaths {
 
     // depth first search from v
     private void randomDFS(Graph G, int v) {
-        // TODO
+        marked[v] = true;
+        Collections.shuffle(G.adj(v));
+        for (int w : G.adj(v)) {
+            if (!marked[w]) {
+                edgeTo[w] = v;
+                randomDFS(G, w);
+            }
+        }
     }
 
     public void randomNonrecursiveDFS(Graph G) {
-        // TODO
+        marked = new boolean[G.V()];
+
+        Iterator<Integer>[] adj = (Iterator<Integer>[]) new Iterator[G.V()];
+        for (int v = 0; v < G.V(); v++) {
+            Collections.shuffle(G.adj(v));
+            adj[v] = G.adj(v).iterator();
+        }
+
+        Stack<Integer> stack = new Stack<Integer>();
+        marked[s] = true;
+        stack.push(s);
+        while (!stack.isEmpty()) {
+            int v = stack.peek();
+            if (adj[v].hasNext()) {
+                int w = adj[v].next();
+                if (!marked[w]) {
+                    marked[w] = true;
+                    edgeTo[w] = v;
+                    stack.push(w);
+                }
+            } else {
+                stack.pop();
+            }
+        }
     }
 
     /**
@@ -59,7 +90,15 @@ public class RandomDepthFirstPaths {
      * 
      */
     public List<Integer> pathTo(int v) {
-        // TODO
+        validateVertex(v);
+        if (!hasPathTo(v)) return null;
+
+        LinkedList<Integer> path = new LinkedList<Integer>();
+        for (int x = v; x != s; x = edgeTo[x]) {
+            path.addFirst(x);
+        }
+        path.addFirst(s);
+        return path;
     }
 
     public int[] edge() {
