@@ -61,6 +61,10 @@ public class DepthFirstPaths {
     }
 
     public void dfs(Graph G) {
+        preorder.clear();
+        postorder.clear();
+        edgeTo = new int[G.V()];
+        distTo = new int[G.V()];
         dfs(G, s);
     }
 
@@ -85,7 +89,11 @@ public class DepthFirstPaths {
 
     public void nonrecursiveDFS(Graph G) {
         // initialise arrays
+        preorder.clear();
+        postorder.clear();
         marked = new boolean[G.V()];
+        edgeTo = new int[G.V()];
+        distTo = new int[G.V()];
 
         // for preorder/postorder the queues are already set up in constructor
         Iterator<Integer>[] adj = (Iterator<Integer>[]) new Iterator[G.V()];
