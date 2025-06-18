@@ -35,7 +35,9 @@ public class Maze{
      * @throws IllegalArgumentException unless both {@code 0 <= v < V} and {@code 0 <= w < V}
      */
     public void addEdge(int v, int w) {
-		// TODO
+        if (!hasEdge(v, w)) {
+            M.addEdge(v, w);
+        }
     }
     
     /**
@@ -45,15 +47,35 @@ public class Maze{
      * @return true or false
      */
     public boolean hasEdge( int v, int w){
-		// TODO
-    }	
+        if (v == w) {
+            return true;
+        }
+        for (int adj : M.adj(v)) {
+            if (adj == w) {
+                return true;
+            }
+        }
+        return false;
+    }
     
     /**
      * Builds a grid as a graph.
      * @return Graph G -- Basic grid on which the Maze is built
      */
     public Graph mazegrid() {
-		// TODO
+        Graph G = new Graph(N * N);
+        for (int row = 0; row < N; row++) {
+            for (int col = 0; col < N; col++) {
+                int v = row * N + col;
+                if (col < N - 1) {
+                    G.addEdge(v, row * N + col + 1);
+                }
+                if (row < N - 1) {
+                    G.addEdge(v, (row + 1) * N + col);
+                }
+            }
+        }
+        return G;
     }
     
     /**
@@ -61,7 +83,16 @@ public class Maze{
      * The maze is build with a randomized DFS as the Graph M.
      */
     private void buildMaze() {
-		// TODO
+        Graph grid = mazegrid();
+        RandomDepthFirstPaths rdfs = new RandomDepthFirstPaths(grid, startnode);
+        rdfs.randomDFS(grid);
+        int[] parent = rdfs.edge();
+        for (int v = 0; v < M.V(); v++) {
+            if (v != startnode) {
+                int p = parent[v];
+                addEdge(v, p);
+            }
+        }
     }
 
     /**
@@ -71,7 +102,9 @@ public class Maze{
      * @return List<Integer> -- a list of nodes on the path from v to w (both included) in the right order.
      */
     public List<Integer> findWay(int v, int w){
-		// TODO
+        DepthFirstPaths dfs = new DepthFirstPaths(M, v);
+        dfs.nonrecursiveDFS(M);
+        return dfs.pathTo(w);
     }
     
     /**
